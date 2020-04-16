@@ -1,0 +1,48 @@
+setwd("~/Desktop/ITEC 621 Predictive Analytics")
+library(readr)
+KickstarterData = read.csv("KickstarterData.csv", header = TRUE, sep = ",")
+View(KickstarterData)
+```{r}
+setwd("~/Desktop/ITEC 621 Predictive Analytics")
+library(readr)
+KickstarterData = read.csv("KickstarterData.csv", header = TRUE, sep = ",")
+#View(KickstarterData)
+```
+
+#Simple Linear Model
+```{r}
+
+fit.PledgeAmt = lm(PledgedAmount~., data =KickstarterData)
+fit.PledgeAmt$call=''
+summary(fit.PledgeAmt)
+```
+
+
+
+#Collinearity
+```{r}
+setwd("~/Desktop/ITEC 621 Predictive Analytics")
+library(readr)
+library(perturb)
+KickstarterData = read.csv("KickstarterData.csv", header = TRUE, sep = ",")
+lm.fit.all = lm(PledgedAmount~ Backers+GoalAmount+Length,data = KickstarterData) 
+colldiag(mod=lm.fit.all, scale=FALSE, center=FALSE, add.intercept=TRUE)
+```
+
+
+
+# PCR - Principle Component Regression
+```{r}
+setwd("~/Desktop/ITEC 621 Predictive Analytics")
+library(readr)
+library(pls)
+set.seed(1)
+trainPledgedAmt=sample(1:nrow(KickstarterData), 0.7*nrow(KickstarterData))
+pcr.fit=pcr(PledgedAmount~.,data = Kickstarter2018[trainPledgedAmt], scale=TRUE, validation="CV")
+pcr.fit$call=''
+summary(pcr.fit)
+validationplot(pcr.fit,val.type="MSEP")
+pcr.pred=predict(pcr.fit,KickstarterData[-trainPledgedAmt,],ncomp=1) 
+mean((pcr.pred-KickstarterData$PledgedAmount[-trainPledgedAmt])^2)
+```
+
